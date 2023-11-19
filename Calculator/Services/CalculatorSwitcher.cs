@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using System;
 
@@ -16,17 +17,20 @@ namespace Calculator.Services
         private IErrorLogger logger;
         private DefaultCalculator calculator;
         private WholeNumberCalculator wholeNumberCalculator;
+        private readonly IConfiguration configuration;
 
-        public CalculatorSwitcher(IErrorLogger logger) 
+        public CalculatorSwitcher(IErrorLogger logger, IConfiguration configuration) 
         {
             this.logger = logger;
+            this.configuration = configuration;
             initCalculators();
         }
 
         private void initCalculators()
         {
-            calculator = new DefaultCalculator(logger);
-            wholeNumberCalculator = new WholeNumberCalculator(logger);
+            this.calculator = new DefaultCalculator(logger);
+            this.wholeNumberCalculator = new WholeNumberCalculator(logger);
+            this.usedCalculator = configuration.GetValue<int>("ControllerSettings:UsedCalculator");
         }
 
         public ICalculator CalculatorSwitch()
@@ -34,13 +38,13 @@ namespace Calculator.Services
             switch (usedCalculator)
             {
                 case 0:
-                    return calculator;
+                    return this.calculator;
                     break;
                 case 1:
-                    return wholeNumberCalculator;
+                    return this.wholeNumberCalculator;
                     break;
                 default:
-                    return calculator;
+                    return this.calculator;
                     break;
             }
         }
@@ -65,12 +69,12 @@ namespace Calculator.Services
 
         private void SwitchToDefaultCalculator()
         {
-            usedCalculator = 0;
+            this.usedCalculator = 0;
         }
 
         private void SwitchToWholeNumberCalculator()
         {
-            usedCalculator = 1;
+            this.usedCalculator = 1;
         }
 
         public int getUsedCalculator()

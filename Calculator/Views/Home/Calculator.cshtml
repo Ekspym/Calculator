@@ -270,7 +270,34 @@
                 }
             }
 
+            async function getCurrentCalc() {
+                const apiUrl = 'http://localhost:5111/api/calculator/currentCalculator';
+
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+
+                    var usedCalc = data;
+                    var calcTypeHeader = document.getElementById('calcType');
+
+                    switch (usedCalc) {
+                        case 0:
+                            calcTypeHeader.innerText = "Decimal Number Calculator";
+                            break;
+                        case 1:
+                            calcTypeHeader.innerText = "Whole Number Calculator";
+                            break;
+                    }
+
+
+                } catch (error) {
+                    console.error('API Error:', error);
+                    // Handle errors here
+                }
+            }
+
             window.onload = loadCalculationHistory();
+            window.onload = getCurrentCalc();
 
 
         </script>

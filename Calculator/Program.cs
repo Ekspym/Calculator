@@ -50,11 +50,10 @@ internal class Program
 
             Log.Information("creating Swagger");
 
-            builder.Services.AddScoped<IErrorLogger, ErrorLogger>();
+            builder.Services.AddSingleton<IErrorLogger, ErrorLogger>();
             builder.Services.AddScoped<ICalculator, Calculator.Services.DefaultCalculator>();
             builder.Services.AddScoped<ICalculator, Calculator.Services.WholeNumberCalculator>();
-
-            builder.Services.AddTransient<ICalculatorSwitcher, CalculatorSwitcher>();
+            builder.Services.AddSingleton<ICalculatorSwitcher, CalculatorSwitcher>();
 
 
 

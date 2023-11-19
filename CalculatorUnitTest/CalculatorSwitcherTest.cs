@@ -1,4 +1,5 @@
 ﻿using Calculator.Services;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,9 @@ namespace CalculatorUnitTest
         {
             // Arrange
             var loggerMock = new Mock<IErrorLogger>();
-            var switcher = new CalculatorSwitcher(loggerMock.Object);
+            var configMoc = new Mock<IConfiguration>();
+
+            var switcher = new CalculatorSwitcher(loggerMock.Object, configMoc.Object);
 
             // Act
             var calculator = switcher.CalculatorSwitch();
@@ -30,7 +33,9 @@ namespace CalculatorUnitTest
         {
             // Arrange
             var loggerMock = new Mock<IErrorLogger>();
-            var switcher = new CalculatorSwitcher(loggerMock.Object);
+            var configMoc = new Mock<IConfiguration>();
+
+            var switcher = new CalculatorSwitcher(loggerMock.Object, configMoc.Object);
             switcher.SwitchCalcType(); // Switch to whole number calculator
 
             // Act
@@ -45,7 +50,9 @@ namespace CalculatorUnitTest
         {
             // Arrange
             var loggerMock = new Mock<IErrorLogger>();
-            var switcher = new CalculatorSwitcher(loggerMock.Object);
+            var configMoc = new Mock<IConfiguration>();
+
+            var switcher = new CalculatorSwitcher(loggerMock.Object, configMoc.Object);
 
             // Act
             switcher.SwitchCalcType();
@@ -59,7 +66,9 @@ namespace CalculatorUnitTest
         {
             // Arrange
             var loggerMock = new Mock<IErrorLogger>();
-            var switcher = new CalculatorSwitcher(loggerMock.Object);
+            var configMoc = new Mock<IConfiguration>();
+
+            var switcher = new CalculatorSwitcher(loggerMock.Object, configMoc.Object);
 
             // Act
             switcher.SwitchCalcType(); // Switch to whole number calculator
@@ -74,7 +83,9 @@ namespace CalculatorUnitTest
         {
             // Arrange
             var loggerMock = new Mock<IErrorLogger>();
-            var switcher = new CalculatorSwitcher(loggerMock.Object);
+            var configMoc = new Mock<IConfiguration>();
+
+            var switcher = new CalculatorSwitcher(loggerMock.Object, configMoc.Object);
 
             // Act
             switcher.SwitchCalcType(); // Switch to whole number calculator

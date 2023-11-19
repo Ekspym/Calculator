@@ -74,6 +74,7 @@ namespace Calculator.Controllers
                     calculation.Operand2 = request.operand2;
                     calculation.Operator = request.operation;
                     calculation.Result = result;
+                    calculation.CalculatorType = calculatorSwitcher.getUsedCalculator();
                     calculation.Timestamp = DateTime.Now;
 
 
@@ -137,6 +138,27 @@ namespace Calculator.Controllers
             {           
                 calculatorSwitcher.SwitchCalcType();
                 string result = JsonConvert.SerializeObject(calculatorSwitcher.getUsedCalculator(), Newtonsoft.Json.Formatting.Indented);
+
+                logger.LogInformation("Request processed. Calculator switched to : "+calculator.GetType());
+
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "An error occurred during calculation.");
+                return StatusCode(500, new { Message = ex.Message });
+            }
+        }
+
+        [HttpGet("currentCalculator")]
+        public IActionResult getCurrectCalculator()
+        {
+            try
+            {               
+                string result = JsonConvert.SerializeObject(calculatorSwitcher.getUsedCalculator(), Newtonsoft.Json.Formatting.Indented);
+
+                logger.LogInformation("Request processed. Current calculator : " + calculator.GetType());
 
                 return Ok(result);
 
