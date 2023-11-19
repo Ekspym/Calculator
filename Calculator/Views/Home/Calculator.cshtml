@@ -1,0 +1,279 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+
+
+}
+
+<style>
+    table {
+        border: 1px solid white;
+        margin-left: auto;
+        margin-right: auto;
+        width: 25%;
+        height: 120px;
+    }
+
+    input[type="button"] {
+        font-size: 24px;
+        font-weight: bold;
+        border: groove;
+        border-radius: 1px;
+    }
+
+    .numbers {
+        background-color: white;
+        color: black;
+        width: 110px;
+        height: 55px;
+    }
+
+    .operators {
+        background-color: lightskyblue;
+        border-color: lightskyblue;
+        color: white;
+        width: 80px;
+        height: 55px;
+    }
+
+    .equals {
+        background-color: green;
+        color: white;
+        width: 110px;
+        height: 55px;
+    }
+
+    .delete {
+        background-color: red;
+        color: white;
+        width: 80px;
+        height: 80px;
+    }
+
+    .switch {
+        background-color: blueviolet;
+        color: white;
+        width: 100px;
+        height: 80px;
+    }
+
+    input[type="text"] {
+        padding: 20px 25px;
+        font-size: 24px;
+        font-weight: bold;
+        text-align: right;
+        border-radius: 2px;
+        border: 2px groove black;
+    }
+
+    #history {
+        margin-top: 20px;
+        /* Specify a clear property to prevent overlap with floating elements */
+        clear: both;
+    }
+
+    .calculation {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .calculator-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px; /* Adjust as needed */
+    }
+</style>
+
+<body>
+    <!-- Create table -->
+    <div class="container">
+        <div class="calculator-container">
+            <div>
+                <h1 id="calcType">Decimal Number Calculator</h1>
+                <table id="calcu" align="left">
+                    <tr>
+                        <td colspan="3">
+                            <input type="text" pattern="[0-9+\-*/]*" id="result" oninput="validateInput(this)">
+                        </td>
+                        <td><input type="button" value="c" class="delete" onclick="clearResult()"></td>
+                    </tr>
+
+                    <tr>
+                        <td><input type="button" value="1" class="numbers" onclick="appendToResult('1')"></td>
+                        <td><input type="button" value="2" class="numbers" onclick="appendToResult('2')"></td>
+                        <td><input type="button" value="3" class="numbers" onclick="appendToResult('3')"></td>
+                        <td><input type="button" value="+" class="operators" onclick="appendToResult('+')"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="button" value="4" class="numbers" onclick="appendToResult('4')"></td>
+                        <td><input type="button" value="5" class="numbers" onclick="appendToResult('5')"></td>
+                        <td><input type="button" value="6" class="numbers" onclick="appendToResult('6')"></td>
+                        <td><input type="button" value="-" class="operators" onclick="appendToResult('-')"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="button" value="7" class="numbers" onclick="appendToResult('7')"></td>
+                        <td><input type="button" value="8" class="numbers" onclick="appendToResult('8')"></td>
+                        <td><input type="button" value="9" class="numbers" onclick="appendToResult('9')"></td>
+                        <td><input type="button" value="*" class="operators" onclick="appendToResult('*')"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="button" value="0" class="numbers" onclick="appendToResult('0')"></td>
+                        <td><input type="button" value="." class="numbers" onclick="appendToResult('.')"></td>
+                        <td><input type="button" value="=" class="equals" onclick="calculateResult()"></td>
+                        <td><input type="button" value="/" class="operators" onclick="appendToResult('/')"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="button" value="Switch" class="switch" onclick="switchCalculation()"></td>
+                    </tr>
+                </table>
+            </div>
+            <!-- Display calculation history -->
+            <div id="history">
+                <h2>Calculation History</h2>
+
+
+                <div id="calcHistory">
+                </div>
+            </div>
+        </div>
+    </div>
+    @section scripts {
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script>
+            var operator = '';
+            var result = document.getElementById("result");
+
+
+            function appendToResult(value) {
+                // Check if the last character in the current result is an operator
+                var isOperator = ['+', '-', '*', '/'].includes(value);
+
+
+
+                // Check if two operators cannot be placed consecutively
+                if (isOperator && operator === '') {
+                    operator = value;
+                }
+                else if (isOperator && operator !== '') {
+                    return; //Do nothing
+                }
+
+                // Concatenate the clicked value to the current result
+                result.value += value;
+            }
+
+            function clearResult() {
+                $("#result").val("");
+                operator = '';
+            }
+
+            function validateInput(input) {
+                // Remove non-numeric characters using a regular expression
+                var cleanedInput = input.value.replace(/[^0-9+\-*/]/g, '');
+
+                // Extract the last character
+                var lastCharacter = cleanedInput.slice(-1);
+                result.value = result.value.slice(0, -1);
+                appendToResult(lastCharacter);
+
+            }
+
+
+            async function calculateResult() {
+                const apiUrl = 'http://localhost:5111/api/calculator/calculate';
+                const urlWithParams = `${apiUrl}?operand1=${operand1}&operand2=${operand2}&operation=${operator}`;
+
+
+                const resultArray = result.value.split(operator)
+                var operand1 = parseFloat(resultArray[0]);
+                var operand2 = parseFloat(resultArray[1]);
+
+                var itemObject = {
+                    operand1: parseFloat(operand1),
+                    operand2: parseFloat(operand2),
+                    operation: operator.toString()
+                };
+
+                var BodyJSON = JSON.stringify(itemObject);
+
+                try {
+                    const response = await fetch(urlWithParams, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: BodyJSON
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    result.value = data.result;
+                    operator = '';
+
+                    loadCalculationHistory();
+                    // Handle the API response here
+                } catch (error) {
+                    console.error('API Error:', error);
+                    // Handle errors here
+                }
+            }
+
+            async function loadCalculationHistory() {
+                const apiUrl = 'http://localhost:5111/api/calculator/calculationHistory'; 
+
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+
+                    // Get the last 10 entries
+                    const lastTenEntries = data.slice(0, 10);
+
+                    const calcHistoryContainer = document.getElementById('calcHistory');
+                    calcHistoryContainer.innerHTML = '';
+
+                    lastTenEntries.forEach(entry => {
+                        const entryElement = document.createElement('p');
+                        entryElement.textContent = ` ${entry.Operand1} ${entry.Operator} ${entry.Operand2} = ${entry.Result}`;
+                        calcHistoryContainer.appendChild(entryElement);
+                    });
+                } catch (error) {
+                    console.error('API Error:', error);
+                    // Handle errors here
+                }
+            }
+
+            async function switchCalculation() {
+                const apiUrl = 'http://localhost:5111/api/calculator/switchCalculator'; 
+
+                try {
+                    const response = await fetch(apiUrl);
+                    const data = await response.json();
+
+                    var usedCalc = data;
+                    var calcTypeHeader = document.getElementById('calcType');
+
+                    switch (usedCalc) {
+                        case 0:
+                            calcTypeHeader.innerText = "Decimal Number Calculator";
+                            break;
+                        case 1:
+                            calcTypeHeader.innerText = "Whole Number Calculator";
+                            break;
+                    }
+
+
+                } catch (error) {
+                    console.error('API Error:', error);
+                    // Handle errors here
+                }
+            }
+
+            window.onload = loadCalculationHistory();
+
+
+        </script>
+    }
+</body>
+
